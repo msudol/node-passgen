@@ -1,5 +1,5 @@
 /**
- * Node Passgen - As a school assignment, develop a utility that generates strong passwords and checks the strength of a user entered password. 
+ * node-passgen - As a school assignment, develop a utility that generates strong passwords and checks the strength of a user entered password. 
  * @license MIT
  *
  *  https://github.com/msudol/node-passgen
@@ -7,7 +7,7 @@
  
 'use strict';
 
-// get our config values
+// get config values
 const config = require('./config/config.js');
 
 // password strength library zxcvbn
