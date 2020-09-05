@@ -25,44 +25,157 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-console.log("=== Node-Passgen Commands ===");
-console.log(" * passgen: generate a secure password");
-console.log(" * checkpass SomePassord: check a password's strength");
-console.log(" * quit: close this program");
+// password generation mode
+let genmode = "default"; 
+
+function showMenu() {
+    // show menu
+    console.log("=== Node-Passgen Commands ===");
+    console.log(" * genmode [string default|ascii]: set the passgen gen mode");
+    console.log(" * passgen [int length]: generate a secure password");
+    console.log(" * checkpass [string SomePassord]: check a password's strength");
+    console.log(" * quit: close this program");    
+}
+
+showMenu();
 
 // set a prompt and to the prompt
 rl.setPrompt(config.prefix);
 rl.prompt();
  
 // line event - basically creates a stream cli
-rl.on('line', function(line) {
- 
+rl.on('line', function(input) {
+    
+    // accept upper and lower input
+    let line = input.toLowerCase();
+    
     // close if user types quit
     if (line === "quit" || line === "q") {
         rl.close();
-    }
-    // passgen
-    else if (line.startsWith("passgen")) {
-        // run command here
-        console.log(password.randomPassword());
-        rl.prompt();
-    }
-    // checkpass [input]
-    else if (line.startsWith("checkpass")) {
-        // split on first space, everything after is considered the password
-        var newline = line.split(/ (.+)/)[1];
-        // run command here
-        console.log(zxcvbn(newline));
-        //TODO: parse this and make our own determination from the library results.
+    } 
+    
+    // set genmode for fun allow some different password complexities
+    else if ((line === "genmode") || (line.startsWith("genmode "))) {
+        
+        // split on first space, everything after is considered the args
+        let args = input.split(/ (.+)/)[1];
+
+        if ((args === undefined) || (args === null)) {
+            console.log("> No arguments defined. Keeping current genmode");
+            rl.prompt();
+        }
+        else if (args === "default") {
+            console.log("> Setting genmode to default");
+            genmode = "default";
+            rl.prompt();
+        }
+        else if (args === "ascii") {
+            console.log("> Setting genmode to full printable ascii");
+            genmode = "ascii";
+            rl.prompt();
+        }
+        else {
+            console.log("> Unknown genmode. Keeping current genmode");
+        }
         
         rl.prompt();
+    }  
+    
+    // passgen
+    else if ((line === ("passgen")) || (line.startsWith("passgen "))) {
+        
+        let gen = true;
+        
+        let passlength = config.passgen.passlength;
+        
+        // split on first space, everything after is considered the args
+        let args = input.split(/ (.+)/)[1];
+        
+        // input should be only int
+        let intreg = /^\d+$/;
+        
+        if ((args !== undefined) && (args !== null)) {
+            if ((intreg.test(args)) && (args >= 4) && (args < 129)) {
+                passlength = parseInt(args);
+            }
+            else {
+                gen = false;
+                console.log("> passgen argument must be an integer from 4 - 128");
+            }
+        }
+        
+        if (gen) {
+            // fully random string using all the printable ascii letters
+            if (genmode == "ascii") {
+                console.log(password.randomString({length: passlength, characters: config.passgen.ascii}));
+            }
+            // reduced special character set, lower entropy
+            else {
+                console.log(password.randomPassword({length: passlength, characters: [password.lower, password.upper, password.digits, password.symbols]}));
+            }
+        }
+        
+        rl.prompt();   
+    }
+    
+    // checkpass [input]
+    else if ((line === "checkpass") || (line.startsWith("checkpass "))) {
+        
+        // split on first space, everything after is considered the args
+        let args = input.split(/ (.+)/)[1];
+        
+        if ((args === undefined) || (args === null)) {
+            console.log("> checkpass requires input, try again...");
+            rl.prompt();
+        }
+        else {
+            // run command here
+            let result = zxcvbn(args);
+          
+            // the library scores 0 - 4, so we'll multiply by 20 to create base scores of 0, 20, 40, 60, 80 and then award bonus points on other factors.
+            let score = result.score * 20;
+            
+            // give some bonuses, up to 20 points so an 80 can make it to 100, and -5 for anything less than 8 chars even it is it strong
+            let bonus = 0;
+            
+            // arbitrary bonus for password length
+            if (args.length < 8) bonus -= 5; // a good, complex 7 char password is still a bad password in my book
+            if (args.length > 7) bonus += 1;
+            if (args.length > 11) bonus += 2;
+            if (args.length > 15) bonus += 3;
+            if (args.length > 19) bonus += 4;
+            if (args.length > 25) bonus += 5;
+            
+            // bonus for a number
+            let intreg = /[0-9]/;
+            if (intreg.test(args)) bonus += 1;
+
+            // bonus for an uppercase
+            let capreg = /[A-Z]/;
+            if (capreg.test(args)) bonus += 1;
+
+            // bonus for an special char
+            let specreg = /[ !\\"#$%&'()*+,\-./:;<=>?@[\]^_`{|}~]/;
+            if (specreg.test(args)) bonus += 3;
+            
+            let finalscore = score + bonus;
+            if (finalscore > 100) finalscore = 100;
+            if (finalscore < 0) finalscore = 0;
+            
+            console.log("> Password Score [0-100]: " + finalscore);
+            
+            rl.prompt();
+        }
     }    
+    
     // run the setvar code (eval a string basically)
     else if (line.startsWith("?") || line.startsWith("help")) {
-        console.log("Try the following commands out:  \n > passgen \n > checkpass somepasswordhere \n > q or quit");
+        showMenu();
         rl.prompt();
-    }        
-    else {
+    }      
+    // prompt again
+    else {   
+        console.log("> Unknown command");
         rl.prompt();
     }
     
@@ -70,6 +183,6 @@ rl.on('line', function(line) {
 
 // close event
 rl.on('close',function(){
-    console.log("\nClosing... bye bye!");
+    console.log("\n> Closing... bye bye!");
     process.exit(0);
 });

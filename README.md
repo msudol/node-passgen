@@ -11,7 +11,8 @@ Installation requires Node.js to be installed as a pre-requisite. Visit https://
 
 Running the app will present a CLI that prompts for user input. The following commands are available:
 
-* passgen: generate a secure password
+* genmode: takes an argument of default|ascii to set the password generation mode
+* passgen: generates a secure password in chosen mode, with optional length argument
 * checkpass: takes a single argument which is a password, and provides a strength score
 * quit: exits the program
 
@@ -29,8 +30,5 @@ secure-random-password is a password generator that wraps secure-random so your 
 https://www.npmjs.com/package/zxcvbn
 
 zxcvbn is a password strength estimator inspired by password crackers. Through pattern matching and conservative estimation, it recognizes and weighs 30k common passwords, common names and surnames according to US census data, popular English words from Wikipedia and US television and movies, and other common patterns like dates, repeats (aaa), sequences (abcd), keyboard patterns (qwertyuiop), and l33t speak.
-
-
-
 
 

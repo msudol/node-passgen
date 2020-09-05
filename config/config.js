@@ -1,10 +1,19 @@
-// config_default.js
-// A Default configuration file which can be more highly configured. Copy to config.js and edit accordingly.
-// See more config examples in the examples folder
+// config.js
+
 'use strict';
 
-var config = {};
+// Static config, do not edit
+let config = {};
+config.passgen = {};
+config.checkpass = {};
 
+// CLI prefix
 config.prefix = 'CMD> ';
+
+// defaults for passgen and genmod command
+config.passgen.passlength = 16;
+config.passgen.ascii = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+
 
 module.exports = config;
