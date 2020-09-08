@@ -141,7 +141,7 @@ rl.on('line', function(input) {
             if (args.length > 11) bonus += 2;
             if (args.length > 15) bonus += 3;
             if (args.length > 19) bonus += 4;
-            if (args.length > 25) bonus += 5;
+            if (args.length > 23) bonus += 5;
             
             // bonus for a number
             let intreg = /[0-9]/;
