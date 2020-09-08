@@ -25,9 +25,6 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-// password generation mode
-let genmode = "default"; 
-
 function showMenu() {
     // show menu
     console.log("=== Node-Passgen Commands ===");
@@ -66,12 +63,12 @@ rl.on('line', function(input) {
         }
         else if (args === "default") {
             console.log("> Setting genmode to default");
-            genmode = "default";
+            config.genmode = "default";
             rl.prompt();
         }
         else if (args === "ascii") {
             console.log("> Setting genmode to full printable ascii");
-            genmode = "ascii";
+            config.genmode = "ascii";
             rl.prompt();
         }
         else {
@@ -106,7 +103,7 @@ rl.on('line', function(input) {
         
         if (gen) {
             // fully random string using all the printable ascii letters
-            if (genmode == "ascii") {
+            if (config.genmode == "ascii") {
                 console.log(password.randomString({length: passlength, characters: config.passgen.ascii}));
             }
             // reduced special character set, lower entropy
@@ -168,7 +165,7 @@ rl.on('line', function(input) {
         }
     }    
     
-    // run the setvar code (eval a string basically)
+    // help menu
     else if (line.startsWith("?") || line.startsWith("help")) {
         showMenu();
         rl.prompt();
