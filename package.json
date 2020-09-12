@@ -6,8 +6,9 @@
   "repository": "https://github.com/msudol/node-passgen.git",
   "license": "MIT",
   "dependencies": {
-    "zxcvbn": "4.4.2",
-    "secure-random-password": "0.2.1"
+    "chalk": "^4.1.0",
+    "secure-random-password": "0.2.1",
+    "zxcvbn": "4.4.2"
   },
   "devDependencies": {},
   "scripts": {

@@ -19,21 +19,26 @@ const password = require('secure-random-password');
 // readline to create a pseudo-CLI program
 const readline = require('readline');
 
+// chalk - https://www.npmjs.com/package/chalk
+const chalk = require('chalk');
+
 // create interface r1
 const rl = readline.createInterface({
     input: process.stdin, 
     output: process.stdout
 });
 
+// function to show a nice UI menu
 function showMenu() {
     // show menu
-    console.log("=== Node-Passgen Commands ===");
-    console.log(" * genmode [string default|ascii]: set the passgen gen mode");
-    console.log(" * passgen [int length]: generate a secure password");
-    console.log(" * checkpass [string SomePassord]: check a password's strength");
-    console.log(" * quit: close this program");    
+    console.log(chalk.inverse("=== Node-Passgen Commands ==="));
+    console.log(chalk.magentaBright(" * genmode [string default|ascii]: set the passgen gen mode"));
+    console.log(chalk.magentaBright(" * passgen [int length]: generate a secure password"));
+    console.log(chalk.magentaBright(" * checkpass [string SomePassord]: check a password's strength"));
+    console.log(chalk.magentaBright(" * quit: close this program"));    
 }
 
+// display the mention
 showMenu();
 
 // set a prompt and to the prompt
@@ -57,6 +62,7 @@ rl.on('line', function(input) {
         // split on first space, everything after is considered the args
         let args = input.split(/ (.+)/)[1];
 
+        // make sure there are arguments
         if ((args === undefined) || (args === null)) {
             console.log("> No arguments defined. Keeping current genmode");
             rl.prompt();
@@ -104,11 +110,11 @@ rl.on('line', function(input) {
         if (gen) {
             // fully random string using all the printable ascii letters
             if (config.genmode == "ascii") {
-                console.log(password.randomString({length: passlength, characters: config.passgen.ascii}));
+                console.log(chalk.greenBright.bold(password.randomString({length: passlength, characters: config.passgen.ascii})));
             }
             // reduced special character set, lower entropy
             else {
-                console.log(password.randomPassword({length: passlength, characters: [password.lower, password.upper, password.digits, password.symbols]}));
+                console.log(chalk.greenBright.bold(password.randomPassword({length: passlength, characters: [password.lower, password.upper, password.digits, password.symbols]})));
             }
         }
         
@@ -159,7 +165,7 @@ rl.on('line', function(input) {
             if (finalscore > 100) finalscore = 100;
             if (finalscore < 0) finalscore = 0;
             
-            console.log("> Password Score [0-100]: " + finalscore);
+            console.log(chalk.greenBright.bold("> Password Score [0-100]: " + finalscore));
             
             rl.prompt();
         }
@@ -180,6 +186,6 @@ rl.on('line', function(input) {
 
 // close event
 rl.on('close',function(){
-    console.log("\n> Closing... bye bye!");
+    console.log(chalk.greenBright("\n> Closing... bye bye!"));
     process.exit(0);
 });
